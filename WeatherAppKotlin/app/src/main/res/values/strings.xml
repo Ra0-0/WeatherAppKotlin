@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">WeatherAppKotlin</string>
+    <string name="weather">Погода</string>
+    <string name="sun_icon">SunIcon</string>
+</resources>
