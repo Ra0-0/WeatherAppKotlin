@@ -24,7 +24,7 @@
 
 
         <EditText
-            android:id="@+id/editTextTextPersonName"
+            android:id="@+id/cityName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
@@ -43,6 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center|end"
             android:background="@color/white"
+            android:onClick="search"
             app:srcCompat="@drawable/search_icon" />
     </FrameLayout>
 
@@ -83,7 +84,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6sp"

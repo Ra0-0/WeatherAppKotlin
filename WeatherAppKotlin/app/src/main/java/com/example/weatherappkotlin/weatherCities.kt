@@ -8,8 +8,11 @@ import android.view.ViewGroup
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+private const val ARG_PARAM1 = "cityName"
+private const val ARG_PARAM2 = "wind"
+private const val ARG_PARAM3 = "temp"
+
+
 
 /**
  * A simple [Fragment] subclass.
@@ -18,14 +21,16 @@ private const val ARG_PARAM2 = "param2"
  */
 class weatherCities : Fragment() {
     // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var cityName: String? = null
+    private var windSpeed: String? = null
+    private var temp: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            cityName = it.getString(ARG_PARAM1)
+            windSpeed = it.getString(ARG_PARAM2)
+            temp = it.getString(ARG_PARAM2)
         }
     }
 
@@ -48,11 +53,12 @@ class weatherCities : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(cityName: String, windSpeed: String, temp: String) =
             weatherCities().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putString(ARG_PARAM1, cityName)
+                    putString(ARG_PARAM2, windSpeed)
+                    putString(ARG_PARAM3, temp)
                 }
             }
     }

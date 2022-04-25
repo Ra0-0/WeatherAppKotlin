@@ -3,10 +3,16 @@ package com.example.weatherappkotlin
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.EditText
 import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.*
+import androidx.room.ForeignKey.CASCADE
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.security.AccessController.getContext
 import java.util.concurrent.Flow
@@ -14,80 +20,102 @@ import java.util.concurrent.Flow
 
 class MainActivity : AppCompatActivity() {
 
-    @Database(entities = [City::class], version = 1, exportSchema = false)
-    abstract class CitiesDatabase : RoomDatabase() {
-        abstract fun citiesDao(): CitiesDao
+    private var db: CitiesDatabase? = null
+    private var cityWeatherDao: CityWeatherTableDao? = null
+    private var citiesDao: CitiesTableDao? = null
 
-        companion object {
-            @Volatile
-            private var INSTANCE: CitiesDatabase? = null
-            fun getDatabase(context: Context): CitiesDatabase {
-                return INSTANCE ?: synchronized(this) {
-                    val instance = Room.databaseBuilder(
-                        context.applicationContext,
-                        CitiesDatabase::class.java,
-                        "citiesWeather_database"
-                    ).build()
-                    INSTANCE = instance
-                    // return instance
-                    instance
-                }
-            }
+    fun getCityWeatherByApi(cityName: String): CityWeather{
+
+        var citiesLatLon = WeatherApiConncetor.apiConnector().directGeocoding(cityName,
+            1, "360cd16dd45ed62190214332afb02a73").execute().body()
+
+        var citiesLat = citiesLatLon?.first()?.lat.toString()
+        var citiesLon = citiesLatLon?.first()?.lon.toString()
+
+        var citiesWeather = WeatherApiConncetor.apiConnector().cityWeather(citiesLat, citiesLon,
+            "metric", "360cd16dd45ed62190214332afb02a73").execute().body()
+        return citiesWeather!!
+    }
+
+    fun getAllCitiesByBd(): List<CityTable>?{
+        var citiesList = citiesDao?.getAll()
+        return citiesList
+    }
+
+    fun insertCityToBd(cityName: String){
+        var city = CityTable(name = cityName)
+        var city_id = citiesDao?.insert(city)
+        var weather = getCityWeatherByApi(cityName)
+        var cityWeather = CityWeatherTable(city_id = city_id?.toInt(), temp = weather.main.temp?.toDouble()?.toInt(),
+            wind = weather.wind.speed?.toDouble()?.toInt())
+        cityWeatherDao!!.insert(cityWeather)
+    }
+
+    fun insertCityWeatherToBd(cityWeather: CityWeatherTable){
+        with(cityWeatherDao){
+            this?.insert(cityWeather)
         }
     }
 
-    @Entity(tableName = "cities_table")
-    class City (
-        @PrimaryKey(autoGenerate = true)
-        var id : Int? = null,
-        @ColumnInfo(name = "name")
-        var name: String? = null
-    )
-
-    @Dao
-    interface CitiesDao {
-        @Insert(onConflict = OnConflictStrategy.IGNORE)
-        fun insert(сity: City)
-
-        @Query("SELECT * FROM cities_table")
-        fun getAllCities(): List<City>
+    fun upateCityWeatherInDb(citiesList :List<CityTable>) {
+        for(city in citiesList!!){
+            var weather = getCityWeatherByApi(city.name!!)
+            cityWeatherDao!!.update(city.id!!, weather.wind.speed!!.toDouble()!!.toInt(),
+                weather.main.temp!!.toDouble()!!.toInt())
+        }
     }
 
-    private var db: CitiesDatabase? = null
-    private var context = this
-    private var citiesDao: CitiesDao? = null
+    fun createAllWeatherFragments() {
+        val container = R.id.weatherFragmentsBox
+        upateCityWeatherInDb(getAllCitiesByBd()!!)
+        var cityWeather = cityWeatherDao?.getAll()
+        for(weather in cityWeather!!){
+            var cityName = citiesDao!!.getCityNameById(weather.city_id!!)
+            var weatherCities = weatherCities.newInstance(cityName, weather.wind.toString(), weather.temp.toString())
+            supportFragmentManager.beginTransaction().add(container, weatherCities).commit()
+        }
+    }
+
+    fun insertNewCity() {
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        var citiesLat : String? = null
-//        var citiesLon : String? = null
-
         GlobalScope.launch {
-//            val citiesLatLon = WeatherApiConncetor.apiConnector().directGeocoding("Набережные Челны",
-//                1, "360cd16dd45ed62190214332afb02a73").execute().body()
-//            citiesLat = citiesLatLon?.first()?.lat.toString()
-//            citiesLon = citiesLatLon?.first()?.lon.toString()
-//            val citiesWeather = WeatherApiConncetor.apiConnector().cityWeather(citiesLat, citiesLon,
-//                "metric", "360cd16dd45ed62190214332afb02a73").execute().body()
-//            Log.i("ApiCon", citiesWeather.toString())
-            db = CitiesDatabase.getDatabase(context = context)
+            db = CitiesDatabase.getDatabase(context = applicationContext)
+            cityWeatherDao = db?.cityWeatherDao()
             citiesDao = db?.citiesDao()
 
-            var city1 = City(name = "s")
+            createAllWeatherFragments()
 
-            with(citiesDao){
-                this?.insert(city1)
-            }
-            var list = db?.citiesDao()?.getAllCities()
-            Log.i("ListApp", list.toString())
-            Log.i("ListApp", list?.get(1)?.name.toString())
+//            Log.i("ApiCon", getAllCitiesByBd(db).toString())
+
+
+//
+//            var city1 = CityTable(name = "s")
+//            var cityWeather1 = CityWeatherTable(city_id = 21, wind = 1, temp = 1)
+//
+
+//            citiesWeatherDao = db?.cityWeatherDao()
+//            with(citiesWeatherDao){
+//                this?.insert(city)
+//            }
+//
+//            var list1 = db?.citiesDao()?.getAllCities()
+
         }
+
+
 
     }
 
-
+    fun search(view: View) {
+        var cityName = findViewById(R.id.cityName) as EditText
+        insertCityToBd(cityName.text.toString())
+    }
 
 
 }
