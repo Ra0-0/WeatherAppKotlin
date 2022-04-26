@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.*
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -18,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private var db: CitiesDatabase? = null
     private var cityWeatherDao: CityWeatherTableDao? = null
     private var citiesDao: CitiesTableDao? = null
+    private var progressBar: ProgressBar? = null
 
     fun getCityWeatherByApi(cityName: String): CityWeather{
 
@@ -71,7 +74,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun createNewFragment(cityName: String, weather: CityWeatherTable) {
-        Log.i("get", cityName)
         val container = R.id.weatherFragmentsBox
         var weatherCities = weatherCities.newInstance(cityName, weather.wind.toString(),
             weather.temp.toString())
@@ -89,25 +91,29 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        progressBar = findViewById<ProgressBar>(R.id.progressBar2)
+        progressBar!!.setVisibility(ProgressBar.VISIBLE)
+        setDate()
+
         GlobalScope.launch {
             db = CitiesDatabase.getDatabase(context = applicationContext, GlobalScope)
             cityWeatherDao = db?.cityWeatherDao()
             citiesDao = db?.citiesDao()
 
-            setDate()
-
             if (savedInstanceState == null) {
                 createAllWeatherFragments()
             }
+            progressBar!!.setVisibility(ProgressBar.INVISIBLE)
         }
+
     }
 
     fun search(view: View) {
+        progressBar!!.setVisibility(ProgressBar.VISIBLE)
         GlobalScope.launch {
             var cityName = findViewById(R.id.cityName) as EditText
             insertCityToBd(cityName.text.toString())
+            progressBar!!.setVisibility(ProgressBar.INVISIBLE)
         }
     }
-
-
 }
