@@ -4,9 +4,11 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/WeatherAndroidApp/WeatherAppKotlin/app/src/main/res/drawable/borders.xml" value="0.2085" />
-        <entry key="..\:/WeatherAndroidApp/WeatherAppKotlin/app/src/main/res/layout-land/activity_main.xml" value="0.25" />
-        <entry key="..\:/WeatherAndroidApp/WeatherAppKotlin/app/src/main/res/layout/activity_main.xml" value="0.25" />
-        <entry key="..\:/WeatherAndroidApp/WeatherAppKotlin/app/src/main/res/layout/fragment_weather_cities.xml" value="0.25" />
+        <entry key="..\:/WeatherAndroidApp/WeatherAppKotlin/app/src/main/res/drawable/no_actionbar.xml" value="0.2545" />
+        <entry key="..\:/WeatherAndroidApp/WeatherAppKotlin/app/src/main/res/layout-land/activity_main.xml" value="0.33" />
+        <entry key="..\:/WeatherAndroidApp/WeatherAppKotlin/app/src/main/res/layout-land/fragment_weather_cities.xml" value="0.17680776014109348" />
+        <entry key="..\:/WeatherAndroidApp/WeatherAppKotlin/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/WeatherAndroidApp/WeatherAppKotlin/app/src/main/res/layout/fragment_weather_cities.xml" value="0.5" />
       </map>
     </option>
   </component>

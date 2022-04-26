@@ -1,21 +1,16 @@
 package com.example.weatherappkotlin
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.EditText
-import androidx.annotation.WorkerThread
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.*
-import androidx.room.ForeignKey.CASCADE
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.security.AccessController.getContext
-import java.util.concurrent.Flow
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -48,13 +43,8 @@ class MainActivity : AppCompatActivity() {
         var weather = getCityWeatherByApi(cityName)
         var cityWeather = CityWeatherTable(city_id = city_id?.toInt(), temp = weather.main.temp?.toDouble()?.toInt(),
             wind = weather.wind.speed?.toDouble()?.toInt())
-        cityWeatherDao!!.insert(cityWeather)
-    }
-
-    fun insertCityWeatherToBd(cityWeather: CityWeatherTable){
-        with(cityWeatherDao){
-            this?.insert(cityWeather)
-        }
+        var cityWeather_id = cityWeatherDao!!.insert(cityWeather)
+        createOneWeatherFragment(cityWeather_id.toInt())
     }
 
     fun upateCityWeatherInDb(citiesList :List<CityTable>) {
@@ -66,18 +56,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun createAllWeatherFragments() {
-        val container = R.id.weatherFragmentsBox
         upateCityWeatherInDb(getAllCitiesByBd()!!)
         var cityWeather = cityWeatherDao?.getAll()
         for(weather in cityWeather!!){
             var cityName = citiesDao!!.getCityNameById(weather.city_id!!)
-            var weatherCities = weatherCities.newInstance(cityName, weather.wind.toString(), weather.temp.toString())
-            supportFragmentManager.beginTransaction().add(container, weatherCities).commit()
+            createNewFragment(cityName, weather)
         }
     }
 
-    fun insertNewCity() {
+    fun createOneWeatherFragment(id: Int) {
+        var weather = cityWeatherDao!!.getCityWeatherById(id)
+        var cityName = citiesDao!!.getCityNameById(weather.city_id!!)
+        createNewFragment(cityName, weather)
+    }
 
+    fun createNewFragment(cityName: String, weather: CityWeatherTable) {
+        Log.i("get", cityName)
+        val container = R.id.weatherFragmentsBox
+        var weatherCities = weatherCities.newInstance(cityName, weather.wind.toString(),
+            weather.temp.toString())
+        supportFragmentManager.beginTransaction().add(container, weatherCities).commit()
+    }
+
+    fun setDate(){
+        val todaysDate = Date()
+        val day = SimpleDateFormat("dd.MM.yyyy").format(todaysDate).toString()
+        val dayOfWeek = SimpleDateFormat("EEEE").format(todaysDate).toString()
+        findViewById<TextView>(R.id.date).text = dayOfWeek + " " + day
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,36 +90,23 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         GlobalScope.launch {
-            db = CitiesDatabase.getDatabase(context = applicationContext)
+            db = CitiesDatabase.getDatabase(context = applicationContext, GlobalScope)
             cityWeatherDao = db?.cityWeatherDao()
             citiesDao = db?.citiesDao()
 
-            createAllWeatherFragments()
+            setDate()
 
-//            Log.i("ApiCon", getAllCitiesByBd(db).toString())
-
-
-//
-//            var city1 = CityTable(name = "s")
-//            var cityWeather1 = CityWeatherTable(city_id = 21, wind = 1, temp = 1)
-//
-
-//            citiesWeatherDao = db?.cityWeatherDao()
-//            with(citiesWeatherDao){
-//                this?.insert(city)
-//            }
-//
-//            var list1 = db?.citiesDao()?.getAllCities()
-
+            if (savedInstanceState == null) {
+                createAllWeatherFragments()
+            }
         }
-
-
-
     }
 
     fun search(view: View) {
-        var cityName = findViewById(R.id.cityName) as EditText
-        insertCityToBd(cityName.text.toString())
+        GlobalScope.launch {
+            var cityName = findViewById(R.id.cityName) as EditText
+            insertCityToBd(cityName.text.toString())
+        }
     }
 
 

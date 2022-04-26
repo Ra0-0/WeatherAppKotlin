@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.core.view.allViews
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -30,7 +32,7 @@ class weatherCities : Fragment() {
         arguments?.let {
             cityName = it.getString(ARG_PARAM1)
             windSpeed = it.getString(ARG_PARAM2)
-            temp = it.getString(ARG_PARAM2)
+            temp = it.getString(ARG_PARAM3)
         }
     }
 
@@ -38,8 +40,12 @@ class weatherCities : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        var viewOfLayout = inflater.inflate(R.layout.fragment_weather_cities, container, false)
+        viewOfLayout.findViewById<TextView>(R.id.nameOfCity).text = cityName
+        viewOfLayout.findViewById<TextView>(R.id.temp).text = temp + "°C"
+        viewOfLayout.findViewById<TextView>(R.id.wind).text = "Ветер " + windSpeed + " м/с"
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_weather_cities, container, false)
+        return viewOfLayout
     }
 
     companion object {

@@ -12,14 +12,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="36sp"
-        android:layout_marginBottom="24sp"
         android:background="@drawable/borders"
         android:paddingLeft="12sp"
         android:paddingTop="4sp"
         android:paddingRight="12sp"
         android:paddingBottom="4sp"
-        app:layout_constraintBottom_toTopOf="@+id/gridLayout"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/container_scroll_view"
         app:layout_constraintStart_toEndOf="@+id/constraintLayout2">
 
 
@@ -29,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:background="@color/white"
-            android:ems="10"
+            android:ems="14"
             android:inputType="text"
             android:paddingLeft="12sp"
             android:paddingTop="6sp"
@@ -89,28 +87,30 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6sp"
             android:fontFamily="sans-serif-condensed"
-            android:text="Понедельник 12/05/2020"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.gridlayout.widget.GridLayout
-        android:id="@+id/gridLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24sp"
-        app:columnCount="2"
+    <ScrollView
+        android:id="@+id/container_scroll_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingTop="24sp"
+        android:paddingBottom="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
-        app:useDefaultMargins="true">
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragmentContainerView2"
-            android:name="com.example.weatherappkotlin.weatherCities"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </androidx.gridlayout.widget.GridLayout>
+        <androidx.gridlayout.widget.GridLayout
+            android:id="@+id/weatherFragmentsBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24sp"
+            app:columnCount="2"
+            app:useDefaultMargins="true" />
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
