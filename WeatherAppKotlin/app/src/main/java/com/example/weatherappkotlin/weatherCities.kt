@@ -44,6 +44,7 @@ class weatherCities : Fragment() {
         viewOfLayout.findViewById<TextView>(R.id.nameOfCity).text = cityName
         viewOfLayout.findViewById<TextView>(R.id.temp).text = temp + "°C"
         viewOfLayout.findViewById<TextView>(R.id.wind).text = "Ветер " + windSpeed + " м/с"
+        // Установка полученных параметров
         // Inflate the layout for this fragment
         return viewOfLayout
     }
@@ -66,6 +67,6 @@ class weatherCities : Fragment() {
                     putString(ARG_PARAM2, windSpeed)
                     putString(ARG_PARAM3, temp)
                 }
-            }
+            } // Получение параметров
     }
 }

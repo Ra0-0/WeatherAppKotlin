@@ -6,10 +6,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
+// Файл для получение данных с Api
+
 data class WeatherLatLon(
     var lat: String? = null,
     var lon: String? = null
-)
+) // Структура ответа для координат города
 
 data class Main(
     var temp: String? = null
@@ -20,7 +22,7 @@ data class Wind(
 data class CityWeather(
     var main : Main,
     var wind : Wind
-)
+) // Структура ответа для погоды
 
 interface WeatherApiConncetor {
 

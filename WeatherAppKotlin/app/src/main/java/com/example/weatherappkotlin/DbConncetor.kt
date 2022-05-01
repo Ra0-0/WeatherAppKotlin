@@ -21,7 +21,7 @@ class CityWeatherTable (
     var temp: Int? = null,
     @ColumnInfo(name = "wind")
     var wind: Int? = null
-)
+) // Таблица для погоды
 
 @Entity(tableName = "cities_table")
 class CityTable (
@@ -29,7 +29,7 @@ class CityTable (
     var id : Int? = null,
     @ColumnInfo(name = "name")
     var name: String? = null
-)
+) // Таблица для городов
 
 @Dao
 interface CityWeatherTableDao {
@@ -88,7 +88,7 @@ abstract class CitiesDatabase : RoomDatabase() {
                 database.execSQL("CREATE TABLE `citiesWeather_table` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `city_id` INTEGER, `temp` INTEGER, `wind` INTEGER," +
                         "FOREIGN KEY(`city_id`) REFERENCES `cities_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE)")
             }
-        }
+        } // Миграция с 1 версии бд на 2
 
         @Volatile
         private var INSTANCE: CitiesDatabase? = null
@@ -125,7 +125,7 @@ abstract class CitiesDatabase : RoomDatabase() {
                                 wDao.insertALot(weatherList)
 
                             }
-                        }
+                        } // Создание встроенных городов при первом включении приложения (Иногда может не показывать, в этом случае нужно перезапустить приложение)
                     }
                 })
                     .addMigrations(MIGRATION_1_2).build()
