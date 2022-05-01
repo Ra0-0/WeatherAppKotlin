@@ -90,6 +90,8 @@ abstract class CitiesDatabase : RoomDatabase() {
             }
         } // Миграция с 1 версии бд на 2
 
+        private val DATABASE_DIR = "databases/cityesWeather.db" // Asset/database/...
+
         @Volatile
         private var INSTANCE: CitiesDatabase? = null
         fun getDatabase(context: Context, scope: CoroutineScope): CitiesDatabase {
@@ -98,36 +100,7 @@ abstract class CitiesDatabase : RoomDatabase() {
                     context.applicationContext,
                     CitiesDatabase::class.java,
                     "citiesWeather_database"
-                ).addCallback(object : RoomDatabase.Callback() {
-                    override fun onCreate(db: SupportSQLiteDatabase) {
-                        super.onCreate(db)
-                        INSTANCE?.let { database ->
-                            scope.launch {
-                                val cDao = database.citiesDao()
-                                val wDao = database.cityWeatherDao()
-
-                                val city1 = CityTable(name = "Набережные Челны")
-                                val city2 = CityTable(name = "Казань")
-                                val city3 = CityTable(name = "Елабуга")
-
-                                val cityList = listOf(city1, city2, city3)
-
-                                val cityCallBack = cDao.insertALot(cityList)
-                                val weather1 =
-                                    CityWeatherTable(city_id = cityCallBack.get(0).toInt(), wind = 0, temp = 0)
-                                val weather2 =
-                                    CityWeatherTable(city_id = cityCallBack.get(1).toInt(), wind = 0, temp = 0)
-                                val weather3 =
-                                    CityWeatherTable(city_id = cityCallBack.get(2).toInt(), wind = 0, temp = 0)
-
-                                val weatherList = listOf(weather1, weather2, weather3)
-
-                                wDao.insertALot(weatherList)
-
-                            }
-                        } // Создание встроенных городов при первом включении приложения (Иногда может не показывать, в этом случае нужно перезапустить приложение)
-                    }
-                })
+                ).createFromAsset(DATABASE_DIR)
                     .addMigrations(MIGRATION_1_2).build()
                 INSTANCE = instance
                 // return instance

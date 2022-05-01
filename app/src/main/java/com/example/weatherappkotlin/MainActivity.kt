@@ -1,15 +1,12 @@
 package com.example.weatherappkotlin
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.room.*
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,39 +19,38 @@ class MainActivity : AppCompatActivity() {
     private var citiesDao: CitiesTableDao? = null // Обращение к Таблице CitiesTable
     private var progressBar: ProgressBar? = null // Загрузка
 
-    fun getCityWeatherByApi(cityName: String): CityWeather{
+    private fun getCityWeatherByApi(cityName: String): CityWeather{
 
-        var citiesLatLon = WeatherApiConncetor.apiConnector().directGeocoding(cityName,
+        val citiesLatLon = WeatherApiConncetor.apiConnector().directGeocoding(cityName,
             1, "360cd16dd45ed62190214332afb02a73").execute().body()
 
-        var citiesLat = citiesLatLon?.first()?.lat.toString()
-        var citiesLon = citiesLatLon?.first()?.lon.toString()
+        val citiesLat = citiesLatLon?.first()?.lat.toString()
+        val citiesLon = citiesLatLon?.first()?.lon.toString()
 
-        var citiesWeather = WeatherApiConncetor.apiConnector().cityWeather(citiesLat, citiesLon,
+        val citiesWeather = WeatherApiConncetor.apiConnector().cityWeather(citiesLat, citiesLon,
             "metric", "360cd16dd45ed62190214332afb02a73").execute().body()
         return citiesWeather!!
     } // Получение данных о температуре и скорости ветра по имени города
 
-    fun getAllCitiesByBd(): List<CityTable>?{
-        var citiesList = citiesDao?.getAll()
-        return citiesList
+    private fun getAllCitiesByBd(): List<CityTable>?{
+        return citiesDao?.getAll()
     } // Получение всех городов из БД
 
-    fun insertCityToBd(cityName: String){
-        var city = CityTable(name = cityName)
-        var city_id = citiesDao?.insert(city)
-        var weather = getCityWeatherByApi(cityName)
-        var cityWeather = CityWeatherTable(city_id = city_id?.toInt(), temp = weather.main.temp?.toDouble()?.toInt(),
+    private fun insertCityToBd(cityName: String){
+        val city = CityTable(name = cityName)
+        val city_id = citiesDao?.insert(city)
+        val weather = getCityWeatherByApi(cityName)
+        val cityWeather = CityWeatherTable(city_id = city_id?.toInt(), temp = weather.main.temp?.toDouble()?.toInt(),
             wind = weather.wind.speed?.toDouble()?.toInt())
-        var cityWeather_id = cityWeatherDao!!.insert(cityWeather)
+        val cityWeather_id = cityWeatherDao!!.insert(cityWeather)
         createOneWeatherFragment(cityWeather_id.toInt())
     } // Ввод нового города в Бд (одноверменное и в CityTble и WeatherTable)
 
     fun upateCityWeatherInDb(citiesList :List<CityTable>) {
-        for(city in citiesList!!){
+        for(city in citiesList){
             var weather = getCityWeatherByApi(city.name!!)
-            cityWeatherDao!!.update(city.id!!, weather.wind.speed!!.toDouble()!!.toInt(),
-                weather.main.temp!!.toDouble()!!.toInt())
+            cityWeatherDao!!.update(city.id!!, weather.wind.speed!!.toDouble().toInt(),
+                weather.main.temp!!.toDouble().toInt())
         }
     } // Обновление погоды в таблице WeatherTable
 
