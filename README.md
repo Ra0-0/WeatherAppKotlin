@@ -1,0 +1,1 @@
+MinSDK: Lollipop 5.0 API level 21
